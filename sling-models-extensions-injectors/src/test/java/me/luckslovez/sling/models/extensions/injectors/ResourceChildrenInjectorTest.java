@@ -3,6 +3,7 @@ package me.luckslovez.sling.models.extensions.injectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.sling.api.resource.Resource;
@@ -14,8 +15,6 @@ import org.apache.sling.testing.mock.sling.junit5.SlingContextExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.google.common.collect.ImmutableMap;
 
 import me.luckslovez.sling.models.extensions.injectors.annotations.ResourceChildren;
 
@@ -38,7 +37,7 @@ class ResourceChildrenInjectorTest {
 
     @Test
     public void testResourceList() {
-        context.create().resource("/resource/child", ImmutableMap.of(PROP, PROP));
+        context.create().resource("/resource/child", Collections.singletonMap(PROP, PROP));
         ResourceListModel testModel = context.getService(ModelFactory.class).createModel(testResource, ResourceListModel.class);
 
         assertNotNull(testModel);
@@ -48,7 +47,7 @@ class ResourceChildrenInjectorTest {
 
     @Test
     public void testSimpleModelList() {
-        context.create().resource("/resource/children/" + CHILD, ImmutableMap.of(PROP, PROP));
+        context.create().resource("/resource/children/" + CHILD, Collections.singletonMap(PROP, PROP));
         SimpleModelListModel testModel = context.getService(ModelFactory.class).createModel(testResource, SimpleModelListModel.class);
 
         assertNotNull(testModel);
@@ -57,7 +56,7 @@ class ResourceChildrenInjectorTest {
 
     @Test
     public void testChildResourceSimpleModelListModel() {
-        context.create().resource("/resource/relative/path/" + CHILD, ImmutableMap.of(PROP, PROP));
+        context.create().resource("/resource/relative/path/" + CHILD, Collections.singletonMap(PROP, PROP));
         ChildResourceSimpleModelListModel testModel = context.getService(ModelFactory.class)
                 .createModel(testResource, ChildResourceSimpleModelListModel.class);
 
