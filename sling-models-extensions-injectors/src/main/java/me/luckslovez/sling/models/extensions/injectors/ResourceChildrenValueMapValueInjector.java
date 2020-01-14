@@ -80,8 +80,8 @@ public class ResourceChildrenValueMapValueInjector implements Injector, InjectAn
                 .filter(ParameterizedType.class::isInstance)
                 .map(ParameterizedType.class::cast)
                 .map(ParameterizedType::getActualTypeArguments)
-                .stream()
-                .flatMap(Arrays::stream)
+                .map(Arrays::stream)
+                .orElseGet(Stream::empty)
                 .findAny()
                 .map(Class.class::cast);
     }

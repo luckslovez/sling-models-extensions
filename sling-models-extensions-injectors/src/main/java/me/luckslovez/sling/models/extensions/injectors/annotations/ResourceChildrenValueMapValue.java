@@ -22,7 +22,7 @@ public @interface ResourceChildrenValueMapValue {
      *
      * @return name
      */
-    String name();
+    String name() default "";
 
     /**
      * Name of the property to be extracted from child resources.
