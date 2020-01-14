@@ -1,7 +1,10 @@
-package luckslovez.sling.models.extensions.injectors;
+package me.luckslovez.sling.models.extensions.injectors;
 
-import luckslovez.sling.models.extensions.injectors.annotations.SuffixParameter;
-import luckslovez.sling.models.extensions.services.MapFactory;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.request.RequestPathInfo;
@@ -15,45 +18,51 @@ import org.jetbrains.annotations.NotNull;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.Optional;
+import me.luckslovez.sling.models.extensions.injectors.annotations.SuffixParameter;
+import me.luckslovez.sling.models.extensions.services.MapFactory;
 
-@Component(service = {Injector.class, InjectAnnotationProcessorFactory2.class})
+@Component
 public class SuffixParameterInjector implements Injector, InjectAnnotationProcessorFactory2 {
 
     @Reference
     private MapFactory mapFactory;
 
     @Override
+    @NotNull
     public String getName() {
         return "suffix-parameter";
     }
 
     @Override
-    public Object getValue(@NotNull Object adaptable, @NotNull String fieldName, @NotNull Type type, @NotNull AnnotatedElement annotatedElement, @NotNull DisposalCallbackRegistry disposalCallbackRegistry) {
+    public Object getValue(@NotNull Object adaptable, @NotNull String fieldName, @NotNull Type type,
+            @NotNull AnnotatedElement annotatedElement, @NotNull DisposalCallbackRegistry disposalCallbackRegistry) {
 
-        final String name = Optional.of(annotatedElement)
-                .map(a -> a.getAnnotation(SuffixParameter.class))
-                .map(SuffixParameter::name)
-                .filter(StringUtils::isNotEmpty)
-                .orElseGet(() -> Optional.of(annotatedElement)
-                                    .map(Field.class::cast)
-                                    .map(Field::getName)
-                                    .orElse(null));
+        final SuffixParameter suffixParameterAnnotation = annotatedElement.getAnnotation(SuffixParameter.class);
 
-        return name != null
-            ? Optional.of(adaptable)
-                .filter(SlingHttpServletRequest.class::isInstance)
-                .map(SlingHttpServletRequest.class::cast)
-                .map(SlingHttpServletRequest::getRequestPathInfo)
-                .map(RequestPathInfo::getSuffix)
-                .map(suffix -> suffix.split("/"))
-                .map(mapFactory::keyValuesToMap)
-                .map(map -> map.get(name))
-                .orElse(null)
-            : null;
+        if (suffixParameterAnnotation != null) {
+            final String name = Optional.of(suffixParameterAnnotation.name())
+                    .filter(StringUtils::isNotEmpty)
+                    .orElseGet(() -> Optional.of(annotatedElement)
+                            .map(Field.class::cast)
+                            .map(Field::getName)
+                            .orElse(null));
+
+            final String separator = suffixParameterAnnotation.separator();
+
+            return name != null
+                    ? Optional.of(adaptable)
+                    .filter(SlingHttpServletRequest.class::isInstance)
+                    .map(SlingHttpServletRequest.class::cast)
+                    .map(SlingHttpServletRequest::getRequestPathInfo)
+                    .map(RequestPathInfo::getSuffix)
+                    .map(suffix -> suffix.split("/"))
+                    .map((String[] keyValues) -> mapFactory.keyValuesToMap(keyValues, separator))
+                    .map(map -> map.get(name))
+                    .orElse(null)
+                    : null;
+        }
+
+        return null;
 
     }
 

@@ -1,10 +1,8 @@
-package luckslovez.sling.models.extensions.injectors.suffixparameter;
+package me.luckslovez.sling.models.extensions.injectors.suffixparameter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import luckslovez.sling.models.extensions.injectors.SuffixParameterInjector;
-import luckslovez.sling.models.extensions.injectors.annotations.SuffixParameter;
-import luckslovez.sling.models.extensions.services.MapFactory;
-import luckslovez.sling.models.extensions.services.impl.MapFactoryImpl;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.models.annotations.Model;
 import org.apache.sling.testing.mock.sling.junit5.SlingContext;
@@ -13,14 +11,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import me.luckslovez.sling.models.extensions.injectors.SuffixParameterInjector;
+import me.luckslovez.sling.models.extensions.injectors.annotations.SuffixParameter;
+import me.luckslovez.sling.models.extensions.services.MapFactory;
+import me.luckslovez.sling.models.extensions.services.impl.MapFactoryImpl;
 
 @ExtendWith(SlingContextExtension.class)
 public class SuffixParameterInjectorTest {
 
     private final SlingContext context = new SlingContext();
-
 
     @BeforeEach
     public void setUp() {
@@ -38,7 +37,6 @@ public class SuffixParameterInjectorTest {
         assertNotNull(noNameModel);
         assertEquals("value", noNameModel.param);
     }
-
 
     @Test
     public void testCustomName() {
