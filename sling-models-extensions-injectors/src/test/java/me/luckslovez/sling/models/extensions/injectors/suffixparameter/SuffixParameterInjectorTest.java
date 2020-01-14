@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.models.annotations.Model;
+import org.apache.sling.models.factory.ModelFactory;
 import org.apache.sling.testing.mock.sling.junit5.SlingContext;
 import org.apache.sling.testing.mock.sling.junit5.SlingContextExtension;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ public class SuffixParameterInjectorTest {
 
     @Test
     public void testDefaultFieldName() {
-        NoName noNameModel = context.request().adaptTo(NoName.class);
+        NoName noNameModel = context.getService(ModelFactory.class).createModel(context.request(), NoName.class);
 
         assertNotNull(noNameModel);
         assertEquals("value", noNameModel.param);
@@ -40,10 +41,20 @@ public class SuffixParameterInjectorTest {
 
     @Test
     public void testCustomName() {
-        CustomName customNameModel = context.request().adaptTo(CustomName.class);
+        CustomName customNameModel = context.getService(ModelFactory.class).createModel(context.request(), CustomName.class);
 
         assertNotNull(customNameModel);
         assertEquals("value", customNameModel.customName);
+    }
+
+    @Test
+    public void testCustomSeparators() {
+        context.requestPathInfo().setSuffix("/prop:value&another:value");
+        CustomSeparators customSeparators = context.getService(ModelFactory.class).createModel(context.request(), CustomSeparators.class);
+
+        assertNotNull(customSeparators);
+        assertEquals("value", customSeparators.prop);
+        assertEquals("value", customSeparators.another);
     }
 
     @Model(adaptables = SlingHttpServletRequest.class)
@@ -56,6 +67,14 @@ public class SuffixParameterInjectorTest {
     public static class CustomName {
         @SuffixParameter(name = "param")
         public String customName;
+    }
+
+    @Model(adaptables = SlingHttpServletRequest.class)
+    public static class CustomSeparators {
+        @SuffixParameter(suffixSplitSeparator = "&", keyValueSplitSeparator = ":")
+        public String prop;
+        @SuffixParameter(suffixSplitSeparator = "&", keyValueSplitSeparator = ":")
+        public String another;
     }
 
 }

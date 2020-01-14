@@ -47,7 +47,8 @@ public class SuffixParameterInjector implements Injector, InjectAnnotationProces
                             .map(Field::getName)
                             .orElse(null));
 
-            final String separator = suffixParameterAnnotation.separator();
+            final String suffixSplitSeparator = suffixParameterAnnotation.suffixSplitSeparator();
+            final String keyValueSplitSeparator = suffixParameterAnnotation.keyValueSplitSeparator();
 
             return name != null
                     ? Optional.of(adaptable)
@@ -55,11 +56,12 @@ public class SuffixParameterInjector implements Injector, InjectAnnotationProces
                     .map(SlingHttpServletRequest.class::cast)
                     .map(SlingHttpServletRequest::getRequestPathInfo)
                     .map(RequestPathInfo::getSuffix)
-                    .map(suffix -> suffix.split("/"))
-                    .map((String[] keyValues) -> mapFactory.keyValuesToMap(keyValues, separator))
+                    .map(suffix -> StringUtils.substring(suffix, 1))
+                    .map(suffix -> StringUtils.split(suffix, suffixSplitSeparator))
+                    .map((String[] keyValues) -> mapFactory.keyValuesToMap(keyValues, keyValueSplitSeparator))
                     .map(map -> map.get(name))
                     .orElse(null)
-                    : null;
+                    : "";
         }
 
         return null;

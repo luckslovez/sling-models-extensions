@@ -24,11 +24,18 @@ public @interface SuffixParameter {
     String name() default "";
 
     /**
+     * Key, if empty defaults to <i>=</i>
+     *
+     * @return keyValueSeparator
+     */
+    String suffixSplitSeparator() default "/";
+
+    /**
      * Key/value separator, if empty defaults to <i>=</i>
      *
-     * @return separator
+     * @return splitSeparator
      */
-    String separator() default "=";
+    String keyValueSplitSeparator() default "=";
 
     /**
      * This annotation is meant to inject suffix parameters. Thus it's {@link InjectionStrategy} defaults to OPTIONAL.
